@@ -14,7 +14,7 @@
     public static synchronized void a() {     } 
     public static synchronized void b() {     } } 
     
-    https://github.com/unlceli/AndroidAdvanceNote/blob/master/app/src/main/java/advance/li/androidadvancenote/01synchronized/synchronized.md
+   https://github.com/unlceli/AndroidAdvanceNote/blob/master/app/src/main/java/advance/li/androidadvancenote/01synchronized/synchronized.md
 
 第二周  Service 话题：
 清晰地理解 Service。 1、Service的 start 和 bind 状态有什么区别？ 2、同一个 Service，先 startService，然后再 bindService，如何把它停止掉？ 3、你有注意到 Service 的onStartCommand 方法的返回值吗？不同返回值有什么区别？ 4、Service的生命周期方法 onCreate、onStart、onBind 等运行在哪个线程？ 
