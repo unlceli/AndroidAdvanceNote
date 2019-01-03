@@ -52,3 +52,12 @@
 
 
 ----------
+
+Activity的启动模式
+
+    standard模式：在这种模式下，activity默认会进入启动它的activity所属的任务栈中。      注意：在非activity类型的context（如ApplicationContext）并没有所谓的任务栈，所以不能通过ApplicationContext去启动standard模式的activity。
+    singleTop模式：栈顶复用模式。如果新activity位于任务栈的栈顶的时候，activity不会被重新创建，同时它的onNewIntent方法会被回调。     注意：这个activity的onCreate，onStart，onResume不会被回调，因为他们并没有发生改变。
+    singleTask模式：栈内复用模式。只要activity在一个栈中存在，那么多次启动此activity不会被重新创建单例，系统会回调onNewIntent。比如activityA，系统首先会寻找是否存在A想要的任务栈，如果没有则创建一个新的任务栈，然后把activityA压入栈，如果存在任务栈，然后再看看有没有activityA的实例，如果实例存在，那么就会把A调到栈顶并调用它的onNewIntent方法，如果不存在则把它压入栈。
+    singleInstance模式：单实例模式。这种模式的activity只能单独地位于一个任务栈中。由于站内复用特性，后续的请求均不会创建新的activity实例。
+
+
