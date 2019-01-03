@@ -16,6 +16,14 @@
 - 从activity是否可见来说，onstart()和onStop()是配对的，从activity是否在前台来说，onResume()和onPause()是配对的。
 - 旧activity先onPause，然后新activity在启动
 
+    异常的情况：
+    1.资源相关的系统配置发生改变导致activity被杀死并重新创建
+    比如说当前activity处于竖屏状态，如果突然旋转屏幕，由于系统配置发生了改变，在默认情况下，activity就会被销毁并且重新创建，当然我们也可以组织系统重新创建我们的activity。
+    2.资源内存不足导致低优先级的activity被杀死
+    这里的情况和前面的情况1数据存储和恢复是完全一致的，activity按照优先级从高到低可以分为如下三种：
+    （1）前台activity---正在和用户交互的activity，优先级最高
+    （2）可见但非前台activity---比如activity中弹出了一个对话框，导致activity可见但是位于后台无法和用户直接交互。
+    （3）后台activity---已经被暂停的activity，比如执行了onStop，优先级最低。
 	注意：当activity中弹出dialog对话框的时候，activity不会回调onPause。
 	然而当activity启动dialog风格的activity的时候，此activity会回调onPause函数。
 
