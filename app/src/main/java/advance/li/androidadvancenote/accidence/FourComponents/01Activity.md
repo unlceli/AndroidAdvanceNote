@@ -61,3 +61,13 @@ Activity的启动模式
     singleInstance模式：单实例模式。这种模式的activity只能单独地位于一个任务栈中。由于站内复用特性，后续的请求均不会创建新的activity实例。
 
 
+##Activity与Fragment生命周期关系
+创建过程
+
+![](https://i.imgur.com/HvJKfIS.png)
+
+销毁过程
+
+![](https://i.imgur.com/0bmu4Be.png)
+
+
