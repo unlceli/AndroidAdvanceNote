@@ -16,20 +16,12 @@
 - 从activity是否可见来说，onstart()和onStop()是配对的，从activity是否在前台来说，onResume()和onPause()是配对的。
 - 旧activity先onPause，然后新activity在启动
 
-    异常的情况：
-    1.资源相关的系统配置发生改变导致activity被杀死并重新创建
-    比如说当前activity处于竖屏状态，如果突然旋转屏幕，由于系统配置发生了改变，在默认情况下，activity就会被销毁并且重新创建，当然我们也可以组织系统重新创建我们的activity。
-    2.资源内存不足导致低优先级的activity被杀死
-    这里的情况和前面的情况1数据存储和恢复是完全一致的，activity按照优先级从高到低可以分为如下三种：
-    （1）前台activity---正在和用户交互的activity，优先级最高
-    （2）可见但非前台activity---比如activity中弹出了一个对话框，导致activity可见但是位于后台无法和用户直接交互。
-    （3）后台activity---已经被暂停的activity，比如执行了onStop，优先级最低。
 	注意：当activity中弹出dialog对话框的时候，activity不会回调onPause。
 	然而当activity启动dialog风格的activity的时候，此activity会回调onPause函数。
 
-	
-###生命周期：
- 
+
+##生命周期：
+
 ----------
 正常的使命周期与横竖屏：
 
@@ -51,15 +43,22 @@
 	04-11 10:02:32.516 11757-11757/cn.hotwoo.play:remote I/MainActivity: onDestroy
 
 
+	异常的情况：
+    1.资源相关的系统配置发生改变导致activity被杀死并重新创建
+    比如说当前activity处于竖屏状态，如果突然旋转屏幕，由于系统配置发生了改变，在默认情况下，activity就会被销毁并且重新创建，当然我们也可以组织系统重新创建我们的activity。
+    2.资源内存不足导致低优先级的activity被杀死
+    这里的情况和前面的情况1数据存储和恢复是完全一致的，activity按照优先级从高到低可以分为如下三种：
+    （1）前台activity---正在和用户交互的activity，优先级最高
+    （2）可见但非前台activity---比如activity中弹出了一个对话框，导致activity可见但是位于后台无法和用户直接交互。
+    （3）后台activity---已经被暂停的activity，比如执行了onStop，优先级最低。
+	注意：当activity中弹出dialog对话框的时候，activity不会回调onPause。
+	然而当activity启动dialog风格的activity的时候，此activity会回调onPause函数。
+
+	防止重新创建activity：activity指定configChange属性来不让系统重新创建activity。
+	android : configChanges = "orientation"
+
+
 ----------
-
-Activity的启动模式
-
-    standard模式：在这种模式下，activity默认会进入启动它的activity所属的任务栈中。      注意：在非activity类型的context（如ApplicationContext）并没有所谓的任务栈，所以不能通过ApplicationContext去启动standard模式的activity。
-    singleTop模式：栈顶复用模式。如果新activity位于任务栈的栈顶的时候，activity不会被重新创建，同时它的onNewIntent方法会被回调。     注意：这个activity的onCreate，onStart，onResume不会被回调，因为他们并没有发生改变。
-    singleTask模式：栈内复用模式。只要activity在一个栈中存在，那么多次启动此activity不会被重新创建单例，系统会回调onNewIntent。比如activityA，系统首先会寻找是否存在A想要的任务栈，如果没有则创建一个新的任务栈，然后把activityA压入栈，如果存在任务栈，然后再看看有没有activityA的实例，如果实例存在，那么就会把A调到栈顶并调用它的onNewIntent方法，如果不存在则把它压入栈。
-    singleInstance模式：单实例模式。这种模式的activity只能单独地位于一个任务栈中。由于站内复用特性，后续的请求均不会创建新的activity实例。
-
 
 ##Activity与Fragment生命周期关系
 创建过程
@@ -70,4 +69,57 @@ Activity的启动模式
 
 ![](https://i.imgur.com/0bmu4Be.png)
 
+##Activity 启动模式
+- standard 模式： 在这种模式下，activity默认会进入启动它的activity所属的任务栈中。注意：在非activity类型的context（如ApplicationContext）并没有所谓的任务栈，所以不能通过ApplicationContext去启动standrar模式的activity。
+- singleTop 模式：栈顶复用模式。如果新activity无语任务栈的栈顶的时候，activity不会被重新创建，同时onNewIntent方法会被调用。注意：这个activity的onCreate，onStart，onResume不会被调用，因为他们并没有发生改变。
+- SingleTask模式：栈内服用模式。只要activity在一个栈中存在，那么多次启动此activity不会被重新创建单例，系统回调onNewIntent。比如ActivityA，系统首先会寻找存在A想要的任务栈，如果没有则创建一个新的任务栈，然后把ActivityA压入栈中，如果存在任务栈，然后再看看有没有ActivityA 的实例，如果实例存在，那么久会把A调到栈顶并调用它的onNewIntent方法，如果不存在则把它压入栈中。
+- SingleInstance模式：单实例模式，这种模式activity只能单独地唯一一个任务栈中。由于栈内复用特性，后续的请求均不会创建新的activity实例。
 
+
+#Android 四大组件- Service
+
+###本地服务（LocalService）
+ 	调用者和sercice在同一个进程里，所有运行在主线程的man线程中，所以不能进行耗时操作，
+	可以采用在service里面创建一个Thread来执行任务，service影响的是进程的生命周期，
+	讨论与Thread的区别没有意义。
+	任何Activity都可以控制同一service，而系统也只能创建一个对应Service的实例。
+
+##启动方式
+
+###第一种启动方式
+通过start方式开启服务。
+
+	1.定义一个类继承service。
+	2.manifest.xml文件配置service。
+	3.使用context的startService（Intent）方法启动sercice。
+	4.不在使用时，调用stopService（Intent）方法停止服务。
+
+使用start方法启动的生命周期。
+
+	onCreate -> onStartCommand -> onDestory。
+
+注意：如果服务已经开启，不会重复回调onCreate 方法，如果再次调用Content.startSerice() 方法，
+	service而是会调用onStart 或者onStartCommand方法。停止服务需要调用context.StopService方法，
+	服务停止的时候onDestoty会调用。
+
+特点：一旦服务开启就跟着调用者没有任何的关系，开启者退出了，开启者挂了，服务还在后台长期的运行，开启者不能调用服务里面的方法。
+
+###第二种方法
+
+通过bind的方式开启服务。
+使用service的步骤：
+
+	1.定义一个类继承service。
+	2.在manifest.xml 文件中注册service。
+	3.使用context的bindService（intent，ServiceConnecttion，int）方法调用service。
+	4.不能使用时，调用unbingService（serviceConnection）方法停止该服务。
+
+生命周期：
+
+	oncrate -> onBind -> onUnbind -> onDestory。
+
+注意：绑定服务不会调用Onstart挥着onstartCommand方法。
+
+特点：bind的方法开启服务，绑定五福，调用者挂了服务也会跟着挂掉，绑定着可以调用服务里面的方法。
+
+注：具体代码详见 同目录 ServiceProject 和ServiceActivity。
