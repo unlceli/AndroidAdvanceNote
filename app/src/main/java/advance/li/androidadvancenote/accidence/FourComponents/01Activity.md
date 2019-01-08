@@ -123,3 +123,46 @@
 特点：bind的方法开启服务，绑定五福，调用者挂了服务也会跟着挂掉，绑定着可以调用服务里面的方法。
 
 注：具体代码详见 同目录 ServiceProject 和ServiceActivity。
+
+
+##远程服务
+
+	调用者和service不在同一进程中，service在单独的进程中的main进程中，是一种跨进程通信方式。aidl。
+
+绑定远程服务的步骤：
+
+
+	- 在服务的内部创建一个内部类，提供一个方法，可以间接调用服务的方法
+	- 把暴露的接口文件的扩展名为 .aidl 文件，去掉访问修饰符
+	- 实现服务的onbind方法，继承Bander金额实现aidl定义的接口，提供给外界可调用的方法
+	- 在activity中绑定服务 bindService。
+	- 在服务成功绑定的时候会调用onServiceConnected方法，传递一个IBinder对象。
+	- adil定义的接口 .Stub.asInterface(bind) 调用接口里面的方法。
+
+##IntentService
+
+IntentService 是Service 的子类，比普通的 Service增加额外的功能，先看service本身存在的两个问题：
+
+	- Service不会专门启动一条单独的进程，Service与它所在应用位于同于个进程中，
+	- service也不在一个专门的一条新线程。因此不用改在Service中直接处理耗时的任务。
+
+IntentService特征：
+
+	- 会创建独立的worker线程来处理所有的intent 请求。
+	- 会创建独立的worker线程来处理onHandleIntent() 方法实现的代码，无须处理多线程问题。
+	- 所有请求处理完成后，IntentService会自定停止，无须调用StopSelf（） 方法停止Service。
+	- 为Service的onBind() 提供默认实现返回null。
+	- 为Service的onStartCommand提供模式显示，将请求Intent添加到队列中。
+
+#Android四大组件 -BroadcastReceiver
+
+
+	广播被分为两种不同的类型：“普通广播（Normal broadcasts）”和“有序广播（Ordered broadcasts）”。
+	普通广播是完全异步的，可以在同一时刻（逻辑上）被所有接收者接收到，消息传递的效率比较高
+	，但缺点是：接收者不能将处理结果传递给下一个接收者，并且无法终止广播Intent的传播；
+	然而有序广播是按照接收者声明的优先级别（声明在intent-filter元素的android:priority属性中，
+	数越大优先级别越高,取值范围:-1000到1000。也可以调用IntentFilter对象的setPriority()进行设置），
+	被接收者依次接收广播。如：A的级别高于B,B的级别高于C,那么，广播先传给A，再传给B，最后传给C。
+	A得到广播后，可以往广播里存入数据，当广播传给B时,B可以从广播中得到A存入的数据。
+
+
