@@ -165,4 +165,114 @@ IntentService特征：
 	被接收者依次接收广播。如：A的级别高于B,B的级别高于C,那么，广播先传给A，再传给B，最后传给C。
 	A得到广播后，可以往广播里存入数据，当广播传给B时,B可以从广播中得到A存入的数据。
 
+发送广播
 
+	Context.sendBroadcast();
+	发送的普通广播，所有订阅者都有机会获得并进行处理。
+
+	Context.sendOrderedBroadcast();
+	发送的是有序广播，系统会根据接受者声明的优先级别按顺序逐个执行接受者，前面的接受者有权终止广播
+	(BroadcastReceiver.abortBroadcast()),如果广播被全面的接受者终止，后面的接受者就再也无法获取到广播下一个接受者，
+	通过代码 Bundle bundle =getResultExtras(true)可以获取上一个接受者存入在结果对象中的数据。
+	系统接收短信，发出的广播属于有序广播，如果想阻止用户收到短信，可以通过设置优先级，让你们自定义的接受者先获取到广播，
+	然后终止广播，这样用户就接收不到短信了。
+生命周期
+
+	如果一个广播处理完Onreceive那么系统将认定此对象将不再是一个活动的对象，也就会finished掉它。
+	至此，大家应该能明白 Android的广播生命周期的原理。
+
+	调用对象 -----> 实现onReceive ---- > 结束。
+
+	步骤：
+
+	- 自定义一个类继承BroadcastReceiver
+	- 重新onReceive方法。
+	- 在manifest.xml 中注册。
+
+	注意：BroastcastReceiver 生命周期很短。
+	如果需要在onReceiver 完成一些耗时操作，应该考虑在Service中开启一个新线程处理耗时操作，
+	不应该在BroadcastReceiver中开启一个新的线程，因为BroadcastReceiver生命周期很短，在执行完onReceiver以后就结束。如果开启一个新的线程，可能出现BroadcastReceiver退出以后线程还在，而如果BroadcastReceiver所在的进程结束了，该线程就会被标记一个空线程，根据Android内存管理策略，
+	在系统内存紧张的时候，会按照优先级，结束有限级别低的线程，而空线程无异是优先级最低的，这样就可能导致BroadcastRecceiver启动的西县城不能执行完成。
+
+示例
+
+	public class MyBroadcastReceiver extends BroadcastReceiver {
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Log.i("fuck","intent-action : " + intent.getAction());
+        if(intent.getAction().equals("test")){
+            Toast.makeText(context,"fuck",Toast.LENGTH_LONG).show();
+        }
+    }
+	}
+
+注册
+
+	//广播接收器
+        <receiver android:name=".broadcast.MyBroadcastReceiver">
+
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+                <action android:name="test"/>//这里自定义一个广播动作
+            </intent-filter>
+
+        </receiver>
+
+广播还可以通过动态注册：
+
+	registerReceiver(new MyBroadcastReceiver(),new IntentFilter("test"));
+
+一定要加上这个权限（坑）
+
+	<uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS"/>
+
+注意：xml中注册的优先级高于动态注册广播。
+
+发送广播
+
+	 Intent intent = new Intent("test");
+                sendBroadcast(intent);
+
+###静态注册和动态注册区别。
+
+
+
+	- 动态注册广播不是常驻型广播，也就是说广播跟随activity的生命周期。注意: 在activity结束前，移除广播接收器。
+	 静态注册是常驻型，也就是说当应用程序关闭后，如果有信息广播来，程序也会被系统调用自动运行。
+	- 当广播为有序广播时：
+	1 优先级高的先接收
+	2 同优先级的广播接收器，动态优先于静态
+	3 同优先级的同类广播接收器，静态：先扫描的优先于后扫描的，动态：先注册的优先于后注册的。
+	- 当广播为普通广播时：
+	1 无视优先级，动态广播接收器优先于静态广播接收器
+	2 同优先级的同类广播接收器，静态：先扫描的优先于后扫描的，动态：先注册的优先于后注册的。
+
+小结
+
+
+	- 在Android中如果要发送一个广播必须使用sendBoradCast 向系统发送对象感兴趣的广播接收器中。
+	- 使用广播必须要有一个intent对象必须设置action对象。
+	- 使用广播必须在配置文件中显式的指明该广播对象。
+	- 每次接收广播都会重新生成一个接收广播对象。
+	- 在BroadCastReceiver中尽量不要处理太多的逻辑问题，建议复杂的逻辑交给activity挥着service去处理。
+	- 如果AndroidMainifest.xml中注册，当应用程序关闭的时候，也会接收到广播。在应用程序注册不产生这种情况了。
+
+
+#Android 四大组件- ContentProvider
+
+	ContentProvider是android 四大组件之一的内容提供器，它主要的作用就是讲程序的内部的数据和外部进行共享，
+	为数据提供外部访问接口，被访问的的数据主要以数据库的形式存在，而且还可以选择共享那一部分的数据。
+	这样一来，对于程序当中的隐私数据可以不共享，从而更加安全。ContentProvider是android中一种跨程序共享数据的重要组件。
+
+###使用系统ContentProvider
+
+	系统的ContentProvider有很多，如通话记录，短信，通信录等，都需要和第三方的app进行共享数据。
+	既然是使用系统的，那么COntentProvider的具体实现就不需要我们担心了，使用内容提供者步骤如下：
+
+
+	- 获取ContentProvider实例。
+	- 确定Uri的内容，并解析为具体的Uri实例。
+	- 通过ContentProvider实例来调用相应的方法，传递相应的参数，但是第一个参数总是Uri，它制定了我们要操作的数据的具体地址。
+
+	可以通过获取系统通讯录的联系人信息，显示在listview中来时间这些知识，不要忘记在读取通讯录的时候，在清单文件中加入相应的读取权限。
