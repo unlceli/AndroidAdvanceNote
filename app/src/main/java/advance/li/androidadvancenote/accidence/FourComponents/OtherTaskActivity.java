@@ -12,7 +12,7 @@ public class OtherTaskActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_other_task);
+        setContentView(R.layout.activity_standard);
 
         jump= (Button) findViewById(R.id.btn_other);
         jump.setOnClickListener(new View.OnClickListener() {

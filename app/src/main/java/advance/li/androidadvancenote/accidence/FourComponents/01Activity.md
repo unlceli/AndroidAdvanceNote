@@ -19,9 +19,9 @@
 	注意：当activity中弹出dialog对话框的时候，activity不会回调onPause。
 	然而当activity启动dialog风格的activity的时候，此activity会回调onPause函数。
 
-
+	
 ##生命周期：
-
+ 
 ----------
 正常的使命周期与横竖屏：
 
@@ -108,14 +108,14 @@
 
 通过bind的方式开启服务。
 使用service的步骤：
-
+	
 	1.定义一个类继承service。
 	2.在manifest.xml 文件中注册service。
 	3.使用context的bindService（intent，ServiceConnecttion，int）方法调用service。
 	4.不能使用时，调用unbingService（serviceConnection）方法停止该服务。
 
 生命周期：
-
+	
 	oncrate -> onBind -> onUnbind -> onDestory。
 
 注意：绑定服务不会调用Onstart挥着onstartCommand方法。
@@ -131,7 +131,7 @@
 
 绑定远程服务的步骤：
 
-
+	
 	- 在服务的内部创建一个内部类，提供一个方法，可以间接调用服务的方法
 	- 把暴露的接口文件的扩展名为 .aidl 文件，去掉访问修饰符
 	- 实现服务的onbind方法，继承Bander金额实现aidl定义的接口，提供给外界可调用的方法
@@ -142,12 +142,12 @@
 ##IntentService
 
 IntentService 是Service 的子类，比普通的 Service增加额外的功能，先看service本身存在的两个问题：
-
+	
 	- Service不会专门启动一条单独的进程，Service与它所在应用位于同于个进程中，
 	- service也不在一个专门的一条新线程。因此不用改在Service中直接处理耗时的任务。
 
 IntentService特征：
-
+	
 	- 会创建独立的worker线程来处理所有的intent 请求。
 	- 会创建独立的worker线程来处理onHandleIntent() 方法实现的代码，无须处理多线程问题。
 	- 所有请求处理完成后，IntentService会自定停止，无须调用StopSelf（） 方法停止Service。
@@ -169,7 +169,7 @@ IntentService特征：
 
 	Context.sendBroadcast();
 	发送的普通广播，所有订阅者都有机会获得并进行处理。
-
+	
 	Context.sendOrderedBroadcast();
 	发送的是有序广播，系统会根据接受者声明的优先级别按顺序逐个执行接受者，前面的接受者有权终止广播
 	(BroadcastReceiver.abortBroadcast()),如果广播被全面的接受者终止，后面的接受者就再也无法获取到广播下一个接受者，
@@ -177,14 +177,14 @@ IntentService特征：
 	系统接收短信，发出的广播属于有序广播，如果想阻止用户收到短信，可以通过设置优先级，让你们自定义的接受者先获取到广播，
 	然后终止广播，这样用户就接收不到短信了。
 生命周期
-
+	
 	如果一个广播处理完Onreceive那么系统将认定此对象将不再是一个活动的对象，也就会finished掉它。
 	至此，大家应该能明白 Android的广播生命周期的原理。
-
+	
 	调用对象 -----> 实现onReceive ---- > 结束。
 
-	步骤：
-
+	步骤： 
+	
 	- 自定义一个类继承BroadcastReceiver
 	- 重新onReceive方法。
 	- 在manifest.xml 中注册。
@@ -195,7 +195,7 @@ IntentService特征：
 	在系统内存紧张的时候，会按照优先级，结束有限级别低的线程，而空线程无异是优先级最低的，这样就可能导致BroadcastRecceiver启动的西县城不能执行完成。
 
 示例
-
+	
 	public class MyBroadcastReceiver extends BroadcastReceiver {
 
     @Override
@@ -208,7 +208,7 @@ IntentService特征：
 	}
 
 注册
-
+	
 	//广播接收器
         <receiver android:name=".broadcast.MyBroadcastReceiver">
 
@@ -220,23 +220,23 @@ IntentService特征：
         </receiver>
 
 广播还可以通过动态注册：
-
+		
 	registerReceiver(new MyBroadcastReceiver(),new IntentFilter("test"));
 
 一定要加上这个权限（坑）
-
+	
 	<uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS"/>
 
 注意：xml中注册的优先级高于动态注册广播。
 
 发送广播
-
+	
 	 Intent intent = new Intent("test");
                 sendBroadcast(intent);
 
 ###静态注册和动态注册区别。
 
-
+	
 
 	- 动态注册广播不是常驻型广播，也就是说广播跟随activity的生命周期。注意: 在activity结束前，移除广播接收器。
 	 静态注册是常驻型，也就是说当应用程序关闭后，如果有信息广播来，程序也会被系统调用自动运行。
@@ -250,15 +250,15 @@ IntentService特征：
 
 小结
 
-
+	
 	- 在Android中如果要发送一个广播必须使用sendBoradCast 向系统发送对象感兴趣的广播接收器中。
 	- 使用广播必须要有一个intent对象必须设置action对象。
 	- 使用广播必须在配置文件中显式的指明该广播对象。
 	- 每次接收广播都会重新生成一个接收广播对象。
 	- 在BroadCastReceiver中尽量不要处理太多的逻辑问题，建议复杂的逻辑交给activity挥着service去处理。
 	- 如果AndroidMainifest.xml中注册，当应用程序关闭的时候，也会接收到广播。在应用程序注册不产生这种情况了。
-
-
+	
+	
 #Android 四大组件- ContentProvider
 
 	ContentProvider是android 四大组件之一的内容提供器，它主要的作用就是讲程序的内部的数据和外部进行共享，
@@ -270,7 +270,7 @@ IntentService特征：
 	系统的ContentProvider有很多，如通话记录，短信，通信录等，都需要和第三方的app进行共享数据。
 	既然是使用系统的，那么COntentProvider的具体实现就不需要我们担心了，使用内容提供者步骤如下：
 
-
+	
 	- 获取ContentProvider实例。
 	- 确定Uri的内容，并解析为具体的Uri实例。
 	- 通过ContentProvider实例来调用相应的方法，传递相应的参数，但是第一个参数总是Uri，它制定了我们要操作的数据的具体地址。
