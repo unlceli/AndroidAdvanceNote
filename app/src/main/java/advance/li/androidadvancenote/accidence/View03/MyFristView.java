@@ -1,6 +1,9 @@
 package advance.li.androidadvancenote.accidence.View03;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -49,5 +52,18 @@ public class MyFristView extends View {
         }
 
         setMeasuredDimension(width, height);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        int r = getMeasuredHeight()/2;
+        int centerx =getLeft() +r;
+        int centery = getTop()+ r;
+
+        Paint paint =new Paint();
+        paint.setColor(Color.GREEN);
+
+        canvas.drawCircle(centerx,centery,r,paint);
     }
 }
