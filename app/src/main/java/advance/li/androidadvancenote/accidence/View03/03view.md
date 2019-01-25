@@ -30,7 +30,7 @@
 
 
 
-    先看看onMeasure函数原型：
+##1.1    先看看onMeasure函数原型：
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
 
     参数中的widthMeasureSpec和heightMeasureSpec是个什么鬼？看起来很像width和height，
@@ -40,4 +40,20 @@
     当然，他们并不是一一对应关系哈，这三种模式后面我会详细介绍，但测量模式无非就是这3种情况，而如果使用二进制，我们只需要使用2个bit就可以做到，
     因为2个bit取值范围是[0,3]里面可以存放4个数足够我们用了。
 
-###1.1 onMeasure
+
+## 2.1自定义ViewGroup
+
+    如果是让你负责设计ViewGroup，你会怎么去设计呢？
+
+     1.首先，我们得知道各个子View的大小吧，只有先知道子View的大小，我们才知道当前的ViewGroup该设置为多大去容纳它们。
+
+
+     2.根据子View的大小，以及我们的ViewGroup要实现的功能，决定出ViewGroup的大小
+
+
+     3.ViewGroup和子View的大小算出来了之后，接下来就是去摆放了吧，具体怎么去摆放呢？这得根据你定制的需求去摆放了，比如，你想让子View按照垂直顺序一个挨着一个放，或者是按照先后顺序一个叠一个去放，这是你自己决定的。
+
+
+     4.已经知道怎么去摆放还不行啊，决定了怎么摆放就是相当于把已有的空间"分割"成大大小小的空间，每个空间对应一个子View，我们接下来就是把子View对号入座了，把它们放进它们该放的地方去。
+
+
